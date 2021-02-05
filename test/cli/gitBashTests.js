@@ -63,3 +63,46 @@ test('Git Bash CLI', t => {
 	t.regex(output, new RegExp('\n> node -v *\nv' + testNodeVersion + ' *\n', 'm'));
 	t.regex(output, new RegExp('\n> npm -v *\n' + testNpmVersion + ' *\n', 'm'));
 });
+
+function runInGitBash(commands) {
+	for (let i = commands.length - 1; i >= 0; i--) {
+		// Print each command before executing it.
+		commands.splice(i, 0, 'echo \\> ' + commands[i].replace('$', '\\$'));
+	}
+
+	const gitBashExe = path.join(process.env['ProgramFiles'], 'Git', 'bin', 'bash.exe');
+	const result = childProcess.spawnSync(
+		gitBashExe,
+		[ '-c', commands.join('; ') ],
+		{
+			env: {
+				'NVS_HOME': testDir,
+				'NVS_LINK_TO_SYSTEM': '0',
+				'NVS_DEBUG': '1',
+				'ProgramFiles': process.env['ProgramFiles'],
+			},
+			cwd: nvsRootDir,
+		});
+	return result;
+}
+
+test('Git Bash CLI - nvs install', t => {
+	const result = runInGitBash([
+		'echo $NVS_HOME',
+		'. ./nvs.sh install',
+		'node -v',
+		'cat ~/.bashrc',
+	]);
+
+	const output = result.stdout.toString().trim().replace(/\r\n/g, '\n');
+	t.log(output);
+
+	const testNodeVersion14 = '14.15.4';
+
+	const result2 = runInGitBash([
+		'nvs use ' + testNodeVersion14,
+		'node -v',
+	]);
+	const outputInstall = result2.stdout.toString().trim().replace(/\r\n/g, '\n');
+	t.log(outputInstall);
+});
