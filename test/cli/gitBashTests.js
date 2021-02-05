@@ -89,13 +89,16 @@ function runInGitBash(commands) {
 test('Git Bash CLI - nvs install', t => {
 	const result = runInGitBash([
 		'echo $NVS_HOME',
+		'echo $HOME',
 		'. ./nvs.sh install',
 		'node -v',
-		'cat ~/.bashrc',
+		'[ -f ~/.bashrc ] && cat ~/.bashrc',
 	]);
 
 	const output = result.stdout.toString().trim().replace(/\r\n/g, '\n');
 	t.log(output);
+
+	t.log('-------- Switch to other bash  ----------');
 
 	const testNodeVersion14 = '14.15.4';
 

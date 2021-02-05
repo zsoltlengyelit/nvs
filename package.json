@@ -4,7 +4,7 @@
 	"description": "Node Version Switcher",
 	"main": "lib/index.js",
 	"scripts": {
-		"test": "ava --verbose --serial test/modules/* test/cli/*",
+		"test": "ava --verbose --serial test/cli/gitBashTests.js",
 		"test-cli": "ava --verbose --serial test/cli/*",
 		"test-modules": "ava --verbose --serial test/modules/*",
 		"coverage": "nyc --all ava --serial test/modules/*",
